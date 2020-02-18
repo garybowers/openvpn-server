@@ -1,0 +1,35 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openvpn
+  labels:
+    app: openvpn
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openvpn
+  template:
+    metadata:
+      labels:
+        app: openvpn
+    spec:
+      containers:
+      - name: openvpn
+        image: garybowers/openvpn-server:latest
+        ports:
+        - containerPort: 1194
+        volumeMounts:
+        - mountPath: /dev/net/tun
+          name: dev-tun
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+          privileged: false
+      volumes:
+      - hostPath:
+          path: /dev/net/tun
+          type: CharDevice
+        name: dev-tun
